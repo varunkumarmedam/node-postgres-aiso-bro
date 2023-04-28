@@ -3,8 +3,15 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 var bodyParser = require("body-parser");
+var cors = require('cors')
 
 app.use(bodyParser.json());
+
+app.use(cors({
+  'allowedHeaders': ['Content-Type'],
+  'origin': '*',
+  'preflightContinue': true
+}));
 
 app.use(
   bodyParser.urlencoded({
