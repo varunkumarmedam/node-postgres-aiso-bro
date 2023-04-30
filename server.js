@@ -55,8 +55,8 @@ app.post("/users", async (req, res) => {
   }
 
   try {
-    const text = "INSERT INTO users(name, email) VALUES($1, $2) RETURNING *";
-    const values = [req.body.name, req.body.email];
+    const text = "INSERT INTO users(name, email,department,fromdate,todate,status) VALUES($1, $2, $3, $4, $5, $6) RETURNING *";
+    const values = [req.body.name, req.body.email, req.body.department, req.body.fromdate, req.body.todate, req.body.status];
 
     // callback
     pool.query(text, values, async (err, dbRes) => {
@@ -88,7 +88,11 @@ app.put("/users/:id", async (req, res) => {
   try {
     let query = "UPDATE users SET ";
     if (req.body.name) query += `name = '${req.body.name}',`;
-    if (req.body.email) query += `email = '${req.body.email}' `;
+    if (req.body.email) query += `email = '${req.body.email}',`;
+    if (req.body.department) query += `department = '${req.body.department}',`;
+    if (req.body.fromdate) query += `fromdate = '${req.body.fromdate}',`;
+    if (req.body.todate) query += `todate = '${req.body.todate}',`;
+    if (req.body.status) query += `status = '${req.body.status}' `;
     query += `WHERE id = ${req.params.id}`;
 
     pool.query(query, async (err, dbRes) => {
@@ -134,9 +138,9 @@ app.delete("/users/:id", async (req, res) => {
 
 app.post("/utils", async (req, res) => {
   try {
-    await client.connect();
+
     const query =
-      "CREATE TABLE USERS( id integer primary key generated always as identity, NAME TEXT NOT NULL, EMAIL TEXT NOT NULL );"; // Create database with three fields query
+      "CREATE TABLE USERS( id integer primary key generated always as identity, NAME TEXT NOT NULL, EMAIL TEXT NOT NULL, DEPARTMENT TEXT NOT NULL, FROMDATE TEXT NOT NULL, TODATE TEXT NOT NULL, STATUS TEXT  NOT NULL);"; // Create database with three fields query
 
     // const query = "DROP TABLE users"; // delete users table
 
@@ -149,7 +153,8 @@ app.post("/utils", async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(401).send({ error, message: "something went wrong" });
+    console.log(error);
+    res.status(401).send({ error:error, message: "something went wrong" });
   }
 });
 
