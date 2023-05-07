@@ -29,6 +29,14 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+const slaves_pool = new Pool({
+  user: process.env.USER_OR_DATABASE,
+  host: process.env.HOST,
+  database: process.env.USER_OR_DATABASE,
+  password: process.env.PASSWORD,
+  port: 5001,
+});
+
 app.get("/", (req, res) => {
   res.send("Hello buddy!!");
 });
@@ -37,12 +45,17 @@ app.get("/users", async (req, res) => {
   try {
     const text = "SELECT * FROM users";
 
-    const data = await pool.query(text);
+    const data = await slaves_pool.query(text);
 
     res.status(200).send({ result: data.rows });
   } catch (error) {
-    console.log(error);
-    res.status(401).send({ error, message: "something went wrong" });
+    const text = "SELECT * FROM users";
+
+    const data = await pool.query(text);
+
+    res.status(200).send({ result: data.rows });
+    //console.log(error);
+    //res.status(401).send({ error, message: "something went wrong while retriving users" });
   }
 });
 
