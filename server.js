@@ -93,8 +93,9 @@ app.put("/users/:id", async (req, res) => {
     if (req.body.fromdate) query += `fromdate = '${req.body.fromdate}',`;
     if (req.body.todate) query += `todate = '${req.body.todate}',`;
     if (req.body.status) query += `status = '${req.body.status}' `;
+    if(query.slice(-1)==',')
+    query = query.slice(0,-1);
     query += `WHERE id = ${req.params.id}`;
-
     pool.query(query, async (err, dbRes) => {
       if (err) {
         console.log(err.stack);
@@ -157,7 +158,10 @@ app.post("/utils", async (req, res) => {
     res.status(401).send({ error:error, message: "something went wrong" });
   }
 });
-
+app.get("/:route",(req, res) => {res.status(200).send({ message: "executed query successfully",route:req.params.route});})
 app.listen(process.env.PORT || 3000, () => {
   console.log(`app listening at ${process.env.PORT || 3000}`);
 });
+
+
+
